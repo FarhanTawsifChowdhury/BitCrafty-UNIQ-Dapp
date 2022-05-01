@@ -38,8 +38,8 @@ contract BitCrafty_Contract {
     modifier ownerBalanceIsGreaterThanReward{require(address(this).balance > msg.value, "Smart contract balance should at least be greater than reward ");
         _;}
 
-    constructor() payable{
-        uniq = UNIQ(msg.sender);
+    constructor(IERC20 token) public{
+        uniq = token;
     }
 
     function getTokens()public{
