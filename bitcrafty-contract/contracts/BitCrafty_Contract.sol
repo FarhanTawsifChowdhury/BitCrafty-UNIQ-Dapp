@@ -39,7 +39,7 @@ contract BitCrafty_Contract {
         _;}
 
     constructor() payable{
-        uniq = UNIQ(msg.sender);
+        uniq = UNIQ(500000);
     }
 
     function getTokens()public{

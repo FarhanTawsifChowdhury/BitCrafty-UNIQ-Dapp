@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract UNIQ is ERC20 {
     mapping(address => bool) public isPresent;
-    constructor(address sender) ERC20("UNIQ", "UNIQ") {
-        _mint(sender, 100000);
+    constructor(uint256 amount) ERC20("UNIQ", "UNIQ") {
+        _mint(msg.sender, amount);
     }
 
     function mintTokens() public {
