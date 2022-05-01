@@ -38,13 +38,13 @@ contract BitCrafty_Contract {
     modifier ownerBalanceIsGreaterThanReward{require(address(this).balance > msg.value, "Smart contract balance should at least be greater than reward ");
         _;}
 
-    constructor(){
-        uniq = UNIQ();
+    constructor() payable{
+        uniq = UNIQ(msg.sender);
     }
 
-    function getTokens(){
-        if (isPresent(msg.sender) == False) {
-            isPresent(msg.sender) = True;
+    function getTokens()public{
+        if (isPresent[msg.sender] == false) {
+            isPresent[msg.sender] = true;
             uniq.mintTokens();
         }
     }
@@ -78,7 +78,7 @@ contract BitCrafty_Contract {
         handicraftsSold = handicraftsSold + 1;
         emit Transfer(address(this), msg.sender, handicraftId);
         uniq.transferTokens(price, seller, uniq);
-//        payable(seller).transfer(msg.value);
+        //        payable(seller).transfer(msg.value);
         totalPurchaseValue[msg.sender] = totalPurchaseValue[msg.sender] + idToHandicraft[handicraftId].price;}
 
     function resellHandicraft(uint256 handicraftId, uint256 price) public payable onlyItemOwner(handicraftId) {
@@ -128,7 +128,7 @@ contract BitCrafty_Contract {
 
     function redeemReward(uint reward) public amountSpentIsGreaterThan10 ownerBalanceIsGreaterThanReward payable {
         uniq.transferTokensFrom(reward, msg.sender, uniq, address(this));
-//        payable(msg.sender).transfer(reward);
+        //        payable(msg.sender).transfer(reward);
         totalPurchaseValue[msg.sender] = 0;}
 
 }
