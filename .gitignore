@@ -5,15 +5,13 @@
 /.pnp
 .pnp.js
 .lock
-package-lock.json
-yarn.lock
 
 # testing
 /coverage
+/.idea
 
 # production
 /bitcrafty-app/build
-/.idea
 
 # misc
 .DS_Store
