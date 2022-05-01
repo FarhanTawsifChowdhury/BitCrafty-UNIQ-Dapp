@@ -1,24 +1,30 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "/@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract UNIQ is ERC20 {
     mapping(address => bool) public isPresent;
-    constructor() ERC20("UNIQ", "UNIQ") {
+    constructor(address sender) ERC20("UNIQ", "UNIQ") {
+        _mint(sender, 100000);
     }
 
-    function mintTokens(){
-        _mint(msg.sender, 1000);
+    function mintTokens() public {
+        _mint(msg.sender, 100000);
     }
 
-    function transferTokens(uint256 amount, address to, UNIQ uniq){
-        uint256 erc20balance = token.balanceOf(msg.sender);
+    function decimals() public view virtual override returns (uint8) {
+        return 2;
+    }
+
+    function transferTokens(uint256 amount, address to, UNIQ uniq)public{
+        uint256 erc20balance = uniq.balanceOf(msg.sender);
         require(amount <= erc20balance, "balance is low");
         uniq.transfer(to, amount);
     }
 
-    function transferTokensFrom(uint256 amount, address to, UNIQ uniq, address from){
-        uint256 erc20balance = token.balanceOf(from);
+    function transferTokensFrom(uint256 amount, address to, UNIQ uniq, address from)public{
+        uint256 erc20balance = uniq.balanceOf(from);
         require(amount <= erc20balance, "balance is low");
         uniq.transferFrom(from, to, amount);
     }
