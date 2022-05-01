@@ -35,11 +35,7 @@ function ResellHandicraft() {
             return
         }
         try{
-            let listingPrice = await contract.getListingPrice(priceInEther)
-            listingPrice = listingPrice.toString()
-            const transaction = await contract.resellHandicraft(tokenId, priceInEther,{
-                value: listingPrice
-            })
+            const transaction = await contract.resellHandicraft(tokenId, priceInEther)
             await transaction.wait()
         }
         catch (error)

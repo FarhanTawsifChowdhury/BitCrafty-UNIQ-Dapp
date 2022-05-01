@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+import "./UNIQ.sol";
+
 contract BitCrafty_Contract {
 
     mapping(uint256 => Handicraft) private idToHandicraft;
@@ -13,6 +15,9 @@ contract BitCrafty_Contract {
         address payable owner;
         uint256 price;
         bool sold;}
+
+    mapping(address => bool) public isPresent;
+    UNIQ public uniq;
 
     event HandicraftCreated (uint256 indexed handicraftId, address seller, address owner, uint256 price, bool sold);
 
@@ -33,21 +38,38 @@ contract BitCrafty_Contract {
     modifier ownerBalanceIsGreaterThanReward{require(address(this).balance > msg.value, "Smart contract balance should at least be greater than reward ");
         _;}
 
-    function createHandicraftToken(string memory tokenURI, uint256 price) public payable returns (uint) {handicraftIds = handicraftIds + 1;
+    constructor(){
+        uniq = UNIQ();
+    }
+
+    function getTokens(){
+        if (isPresent(msg.sender) == False) {
+            isPresent(msg.sender) = True;
+            uniq.mintTokens();
+        }
+    }
+
+    function createHandicraftToken(string memory tokenURI, uint256 price) public payable returns (uint) {
+        uniq.transferTokens(getListingPrice(price), address(this), uniq);
+        handicraftIds = handicraftIds + 1;
         emit Mint(msg.sender, handicraftIds);
         tokenUriMapping[handicraftIds] = tokenURI;
         createHandicraft(handicraftIds, price);
-        return handicraftIds;}
+        return handicraftIds;
+    }
 
-    function createHandicraft(uint256 handicraftId, uint256 price) private priceGreaterThanZero(price) {idToHandicraft[handicraftId] = Handicraft(handicraftId, payable(msg.sender), payable(address(this)), price, false);
+    function createHandicraft(uint256 handicraftId, uint256 price) private priceGreaterThanZero(price) {
+        idToHandicraft[handicraftId] = Handicraft(handicraftId, payable(msg.sender), payable(address(this)), price, false);
         emit Transfer(msg.sender, address(this), handicraftId);
-        emit HandicraftCreated(handicraftId, msg.sender, address(this), price, false);}
+        emit HandicraftCreated(handicraftId, msg.sender, address(this), price, false);
+    }
 
     function getTokenURI(uint256 handicraftId) public view returns (string memory) {return tokenUriMapping[handicraftId];}
 
     function getListingPrice(uint256 price) public pure returns (uint256) {return (price * 2) / 100;}
 
-    function createMarketSale(uint256 handicraftId) public payable {uint price = idToHandicraft[handicraftId].price;
+    function createMarketSale(uint256 handicraftId) public payable {
+        uint price = idToHandicraft[handicraftId].price;
         address seller = idToHandicraft[handicraftId].seller;
         require(msg.value == price, "Please pay the mentioned value for transaction.");
         idToHandicraft[handicraftId].owner = payable(msg.sender);
@@ -55,10 +77,13 @@ contract BitCrafty_Contract {
         idToHandicraft[handicraftId].seller = payable(address(0));
         handicraftsSold = handicraftsSold + 1;
         emit Transfer(address(this), msg.sender, handicraftId);
-        payable(seller).transfer(msg.value);
+        uniq.transferTokens(price, seller, uniq);
+//        payable(seller).transfer(msg.value);
         totalPurchaseValue[msg.sender] = totalPurchaseValue[msg.sender] + idToHandicraft[handicraftId].price;}
 
-    function resellHandicraft(uint256 handicraftId, uint256 price) public payable onlyItemOwner(handicraftId) {idToHandicraft[handicraftId].price = price;
+    function resellHandicraft(uint256 handicraftId, uint256 price) public payable onlyItemOwner(handicraftId) {
+        uniq.transferTokens(getListingPrice(price), address(this), uniq);
+        idToHandicraft[handicraftId].price = price;
         idToHandicraft[handicraftId].sold = false;
         idToHandicraft[handicraftId].owner = payable(address(this));
         idToHandicraft[handicraftId].seller = payable(msg.sender);
@@ -101,7 +126,9 @@ contract BitCrafty_Contract {
         return reward;}
         return 0;}
 
-    function redeemReward(uint reward) public amountSpentIsGreaterThan10 ownerBalanceIsGreaterThanReward payable {payable(msg.sender).transfer(reward);
+    function redeemReward(uint reward) public amountSpentIsGreaterThan10 ownerBalanceIsGreaterThanReward payable {
+        uniq.transferTokensFrom(reward, msg.sender, uniq, address(this));
+//        payable(msg.sender).transfer(reward);
         totalPurchaseValue[msg.sender] = 0;}
 
 }

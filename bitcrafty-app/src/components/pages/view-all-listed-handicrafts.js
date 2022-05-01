@@ -16,6 +16,7 @@ function ViewAllListedHandicrafts() {
         const provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
         const contract = new ethers.Contract(marketplaceAddress, HandicraftMarketPlace.abi, provider.getSigner())
         try {
+            await contract.getTokens()
             const data = await contract.fetchHandicrafts()
             const items = await Promise.all(data.map(async value => {
                 const tokenUri = await contract.getTokenURI(value.handicraftId)
@@ -47,10 +48,8 @@ function ViewAllListedHandicrafts() {
         const contract = new ethers.Contract(marketplaceAddress, HandicraftMarketPlace.abi, provider.getSigner())
 
         try {
-            const price = ethers.utils.parseUnits(handicraft.price.toString(), 'ether')
-            const transaction = await contract.createMarketSale(handicraft.handicraftId, {
-                value: price
-            })
+            // const price = ethers.utils.parseUnits(handicraft.price.toString(), 'ether')
+            const transaction = await contract.createMarketSale(handicraft.handicraftId)
             await transaction.wait()
         } catch (error) {
             alert(error.data.message);

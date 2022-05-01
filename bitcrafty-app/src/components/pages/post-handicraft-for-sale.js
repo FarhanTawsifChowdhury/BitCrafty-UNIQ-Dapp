@@ -48,9 +48,7 @@ export default function PostHandicraftForSale() {
         const provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
         const contract = new ethers.Contract(marketplaceAddress, HandicraftMarketPlace.abi, provider.getSigner())
         try{
-            let listingPrice = await contract.getListingPrice(priceInEther)
-            listingPrice = listingPrice.toString()
-            let transaction = await contract.createHandicraftToken(url, priceInEther, {value: listingPrice})
+            let transaction = await contract.createHandicraftToken(url, priceInEther)
             await transaction.wait()
         }
         catch (error){
