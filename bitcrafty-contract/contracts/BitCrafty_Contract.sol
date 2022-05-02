@@ -20,7 +20,7 @@ contract BitCrafty_Contract {
 
     mapping(address => bool) public isPresent;
     UNIQ private uniq;
-    address private uniqContract;
+    address public uniqContract;
 
     event HandicraftCreated (uint256 indexed handicraftId, address seller, address owner, uint256 price, bool sold);
 
@@ -52,7 +52,8 @@ contract BitCrafty_Contract {
         registrationReward();
     }
 
-    function createHandicraftToken(string memory tokenURI, uint256 price) public payable returns (uint) {transferTokens(getListingPrice(price), address(this));
+    function createHandicraftToken(string memory tokenURI, uint256 price) public payable returns (uint) {
+        transferTokens(getListingPrice(price), address(this));
         handicraftIds = handicraftIds + 1;
         emit Mint(msg.sender, handicraftIds);
         tokenUriMapping[handicraftIds] = tokenURI;
@@ -133,8 +134,12 @@ contract BitCrafty_Contract {
     function transferTokens(uint256 amount, address to) public payable{
         uint256 erc20balance = uniq.balanceOf(msg.sender);
         require(amount <= erc20balance, "balance is low");
-        uniq.approve(msg.sender,amount);
-        uniq.transfer(to, amount);
+        // uniq.increaseAllowance(address(this), 10000);
+        // uniqContract.delegatecall(abi.encodeWithSignature("increaseAllowance(address,uint256)", address(this), 10000));
+        // uniqContract.delegatecall(abi.encodeWithSignature("transferFrom(address,address,uint256)", msg.sender, address(this), 10000));
+        // uniq.transferFrom(msg.sender, address(this),amount);
+        uniq.transferTokensTo(msg.sender, address(this), amount);
+        // uniqContract.delegatecall(abi.encodeWithSignature("transferTokensTo(address,address,uint256)", msg.sender, to, 10000));
     }
 
     function transferTokensFrom(uint256 amount, address to, address from) public payable{
@@ -149,5 +154,4 @@ contract BitCrafty_Contract {
             isPresent[msg.sender] = true;
             uniq.airdrop(msg.sender);
         }}
-
 }

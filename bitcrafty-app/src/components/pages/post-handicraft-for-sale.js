@@ -44,6 +44,7 @@ export default function PostHandicraftForSale() {
             return
         }
         const url = await uploadFile(handicraftName, handicraftDescription)
+        alert(url);
         await window.ethereum.enable();
         const provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
         const contract = new ethers.Contract(marketplaceAddress, HandicraftMarketPlace.abi, provider.getSigner())
