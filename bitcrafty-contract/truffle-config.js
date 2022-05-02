@@ -10,14 +10,14 @@ module.exports = {
             network_id: "5777"
             //, gas: 4600000
         }
-       //  // ,
-       //  ropsten: {
-       //     provider: function () {
-       //         return new HDWalletProvider(MNEMONIC, "https://ropsten.infura.io/v3/00963d6a4ba14fef9cfed71e031f8bb0")
-       //     },
-       //     network_id: 3,
-       //     gas: 4000000      //make sure this gas allocation isn't over 4M, which is the max
-       // }
+        ,
+        ropsten: {
+           provider: function () {
+               return new HDWalletProvider(MNEMONIC, "https://ropsten.infura.io/v3/00963d6a4ba14fef9cfed71e031f8bb0")
+           },
+           network_id: 3,
+           gas: 4000000      //make sure this gas allocation isn't over 4M, which is the max
+       }
     },
     compilers: {
         solc: {

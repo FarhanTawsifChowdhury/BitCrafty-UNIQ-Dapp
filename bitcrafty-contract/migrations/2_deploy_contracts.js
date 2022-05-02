@@ -1,4 +1,3 @@
-const UNIQ = artifacts.require("UNIQ");
 const BitCrafty_Contract = artifacts.require("BitCrafty_Contract");
 const Uniq = artifacts.require("UNIQ");
 

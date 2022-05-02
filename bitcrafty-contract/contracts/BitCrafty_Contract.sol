@@ -20,6 +20,7 @@ contract BitCrafty_Contract {
 
     mapping(address => bool) public isPresent;
     UNIQ private uniq;
+    address private uniqContract;
 
     event HandicraftCreated (uint256 indexed handicraftId, address seller, address owner, uint256 price, bool sold);
 
@@ -41,10 +42,10 @@ contract BitCrafty_Contract {
         _;}
 
 
-    constructor(UNIQ token){
+    constructor(address token){
         owner = msg.sender;
-        uniq = token;
-        //uniq.registrationReward();
+        uniq = UNIQ(token);
+        uniqContract = token;
     }
 
     function getTokens() public{
@@ -124,20 +125,29 @@ contract BitCrafty_Contract {
         return 0;}
 
     function redeemReward(uint reward) public amountSpentIsGreaterThan10 ownerBalanceIsGreaterThanReward payable {
-        //transferTokensFrom(reward, msg.sender, address(this));
-        payable(msg.sender).transfer(reward);
+        transferTokensFrom(reward, msg.sender, address(this));
+        //        payable(msg.sender).transfer(reward);
         totalPurchaseValue[msg.sender] = 0;}
 
 
     function transferTokens(uint256 amount, address to) public payable{
         uint256 erc20balance = uniq.balanceOf(msg.sender);
         require(amount <= erc20balance, "balance is low");
-        uniq.transfer(to, amount);}
+        uniq.approve(msg.sender,amount);
+        uniq.transfer(to, amount);
+    }
+
+    function transferTokensFrom(uint256 amount, address to, address from) public payable{
+        uint256 erc20balance = uniq.balanceOf(msg.sender);
+        require(amount <= erc20balance, "balance is low");
+        //        uniq.approve(address(this),amount);
+        uniq.transferFrom(address(this),msg.sender,amount);
+    }
 
     function registrationReward() public{
         if (!isPresent[msg.sender] == true) {
             isPresent[msg.sender] = true;
-            uniq.transferFrom(uniq.getERC20Owner(),msg.sender,1);
+            uniq.airdrop(msg.sender);
         }}
 
 }
