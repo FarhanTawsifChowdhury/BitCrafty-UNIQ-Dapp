@@ -9,7 +9,7 @@ contract BitCrafty_Contract {
     mapping(uint256 => string) private tokenUriMapping;
 
     mapping(address => uint256) private totalPurchaseValue;
-
+    address[] private listOfAddress;
     address private owner;
 
     struct Handicraft {uint256 handicraftId;
@@ -48,21 +48,22 @@ contract BitCrafty_Contract {
         uniqContract = token;
     }
 
-    function getTokens() public{
+    function getTokens() public {
         registrationReward();
     }
 
     function createHandicraftToken(string memory tokenURI, uint256 price) public payable returns (uint) {
-        transferTokens(getListingPrice(price), address(this));
         handicraftIds = handicraftIds + 1;
         emit Mint(msg.sender, handicraftIds);
         tokenUriMapping[handicraftIds] = tokenURI;
         createHandicraft(handicraftIds, price);
+        transferTokens(getListingPrice(price), address(this), msg.sender);
         return handicraftIds;}
 
     function createHandicraft(uint256 handicraftId, uint256 price) private priceGreaterThanZero(price) {idToHandicraft[handicraftId] = Handicraft(handicraftId, payable(msg.sender), payable(address(this)), price, false);
         emit Transfer(msg.sender, address(this), handicraftId);
-        emit HandicraftCreated(handicraftId, msg.sender, address(this), price, false);}
+        emit HandicraftCreated(handicraftId, msg.sender, address(this), price, false);
+    }
 
     function getTokenURI(uint256 handicraftId) public view returns (string memory) {return tokenUriMapping[handicraftId];}
 
@@ -70,22 +71,23 @@ contract BitCrafty_Contract {
 
     function createMarketSale(uint256 handicraftId) public payable {uint price = idToHandicraft[handicraftId].price;
         address seller = idToHandicraft[handicraftId].seller;
-        require(msg.value == price, "Please pay the mentioned value for transaction.");
+//        require(msg.value == price, "Please pay the mentioned value for transaction.");
         idToHandicraft[handicraftId].owner = payable(msg.sender);
         idToHandicraft[handicraftId].sold = true;
         idToHandicraft[handicraftId].seller = payable(address(0));
         handicraftsSold = handicraftsSold + 1;
         emit Transfer(address(this), msg.sender, handicraftId);
-        transferTokens(price, seller);
+        transferTokens(price, seller, msg.sender);
         //        payable(seller).transfer(msg.value);
         totalPurchaseValue[msg.sender] = totalPurchaseValue[msg.sender] + idToHandicraft[handicraftId].price;}
 
-    function resellHandicraft(uint256 handicraftId, uint256 price) public payable onlyItemOwner(handicraftId) {transferTokens(getListingPrice(price), address(this));
+    function resellHandicraft(uint256 handicraftId, uint256 price) public payable onlyItemOwner(handicraftId) {
         idToHandicraft[handicraftId].price = price;
         idToHandicraft[handicraftId].sold = false;
         idToHandicraft[handicraftId].owner = payable(address(this));
         idToHandicraft[handicraftId].seller = payable(msg.sender);
         emit Transfer(msg.sender, address(this), handicraftId);
+        transferTokens(getListingPrice(price), address(this), msg.sender);
         handicraftsSold = handicraftsSold - 1;}
 
     function fetchHandicrafts() public view returns (Handicraft[] memory) {
@@ -121,37 +123,37 @@ contract BitCrafty_Contract {
             currentIndex += 1;}}
         return items;}
 
-    function fetchRewards() public view returns (uint256) {if (totalPurchaseValue[msg.sender] >= 10) {uint reward = (totalPurchaseValue[msg.sender] * 1) / 100;
+    function fetchRewards() public view returns (uint256) {if (totalPurchaseValue[msg.sender] >= 10) {
+        uint reward = (totalPurchaseValue[msg.sender] * 1) / 100;
         return reward;}
         return 0;}
 
     function redeemReward(uint reward) public amountSpentIsGreaterThan10 ownerBalanceIsGreaterThanReward payable {
-        transferTokensFrom(reward, msg.sender, address(this));
         //        payable(msg.sender).transfer(reward);
-        totalPurchaseValue[msg.sender] = 0;}
+        transferTokens(reward, msg.sender, address(this));
+        totalPurchaseValue[msg.sender] = 0;
+    }
 
 
-    function transferTokens(uint256 amount, address to) public payable{
-        uint256 erc20balance = uniq.balanceOf(msg.sender);
-        require(amount <= erc20balance, "balance is low");
+    function transferTokens(uint256 amount, address to, address from) public payable {
+//        uint256 erc20balance = uniq.balanceOf(msg.sender);
+//        require(amount <= erc20balance, "balance is low");
         // uniq.increaseAllowance(address(this), 10000);
         // uniqContract.delegatecall(abi.encodeWithSignature("increaseAllowance(address,uint256)", address(this), 10000));
         // uniqContract.delegatecall(abi.encodeWithSignature("transferFrom(address,address,uint256)", msg.sender, address(this), 10000));
         // uniq.transferFrom(msg.sender, address(this),amount);
-        uniq.transferTokensTo(msg.sender, address(this), amount);
+        uniq.transferTokensTo(from, to, amount);
         // uniqContract.delegatecall(abi.encodeWithSignature("transferTokensTo(address,address,uint256)", msg.sender, to, 10000));
     }
 
-    function transferTokensFrom(uint256 amount, address to, address from) public payable{
-        uint256 erc20balance = uniq.balanceOf(msg.sender);
-        require(amount <= erc20balance, "balance is low");
-        //        uniq.approve(address(this),amount);
-        uniq.transferFrom(address(this),msg.sender,amount);
-    }
-
-    function registrationReward() public{
+    function registrationReward() public {
         if (!isPresent[msg.sender] == true) {
             isPresent[msg.sender] = true;
             uniq.airdrop(msg.sender);
+            listOfAddress.push(msg.sender);
         }}
+
+    function getAddressesRegisteredForToken() public view returns (address[] memory)  {
+        return listOfAddress;
+    }
 }

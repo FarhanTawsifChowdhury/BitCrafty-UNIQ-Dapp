@@ -3,22 +3,24 @@ import '../style/view-all-listed-handicrafts.css';
 import {ethers} from 'ethers'
 
 import {
-    marketplaceAddress
+    marketplaceAddress, tokenAddress
 } from '../../config'
 
 import HandicraftMarketPlace from 'contracts/BitCrafty_Contract.json'
+import Uniq from 'contracts/UNIQ.json'
 
 function FetchRewards() {
     const [rewardState, setRewardState] = useState('zero')
     useEffect(() => {
-        loadRewards()
+        loadTokens()
     }, [])
-    async function loadRewards() {
-
+    async function loadTokens() {
         await window.ethereum.enable();
         const provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
         const contract = new ethers.Contract(marketplaceAddress, HandicraftMarketPlace.abi, provider.getSigner())
+        const tokencontract = new ethers.Contract(tokenAddress, Uniq.abi, provider.getSigner())
         try{
+            alert(await tokencontract.balanceOf(marketplaceAddress))
             let reward = await contract.fetchRewards()
             reward = ethers.utils.formatUnits(reward.toString(), 'ether')
             if (reward >= 0.1){

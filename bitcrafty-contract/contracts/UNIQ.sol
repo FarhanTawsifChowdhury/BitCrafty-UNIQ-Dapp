@@ -8,24 +8,18 @@ contract UNIQ is ERC20 {
     address public owner;
     constructor() ERC20("UNIQ", "UNIQ") {
         owner = address(this);
-        _mint(owner, 1000000000000000000000000000);
+        _mint(owner, 10000000000000000000000000000);
     }
 
     function airdrop(address receiver) public {
-        _transfer(owner,receiver , 10000);
+        _transfer(owner,receiver , 1000000000000000000000);
     }
 
     function getERC20Owner() view public returns (address) {
         return owner;
     }
 
-    function decimals() public view virtual override returns (uint8) {
-        return 2;
-    }
-
     function transferTokensTo(address from, address to, uint256 amount) public{
-        //increaseAllowance(to, amount);
-        // transferFrom(from, to, amount);
         _transfer(from, to, amount);
     }
 
