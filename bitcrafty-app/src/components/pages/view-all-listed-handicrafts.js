@@ -17,10 +17,11 @@ function ViewAllListedHandicrafts() {
         const provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
         const contract = new ethers.Contract(marketplaceAddress, HandicraftMarketPlace.abi, provider.getSigner())
         try {
-            const listOfAddresses = await contract.getAddressesRegisteredForToken();
-            alert(listOfAddresses)
             const currentAddress = window.web3.currentProvider.selectedAddress;
-            if (listOfAddresses.indexOf(currentAddress)===-1){
+            //alert(currentAddress);
+            let newUserCheck= await contract.getCheckIfAlreadyHaveBonus(currentAddress);
+            //alert(newUserCheck);
+            if (newUserCheck){
                 setLoadingTokens("loaded");
             }
             const data = await contract.fetchHandicrafts()
@@ -54,7 +55,6 @@ function ViewAllListedHandicrafts() {
         const contract = new ethers.Contract(marketplaceAddress, HandicraftMarketPlace.abi, provider.getSigner())
 
         try {
-            // const price = ethers.utils.parseUnits(handicraft.price.toString(), 'ether')
             const transaction = await contract.createMarketSale(handicraft.handicraftId)
             await transaction.wait()
         } catch (error) {
