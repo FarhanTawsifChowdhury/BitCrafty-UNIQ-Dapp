@@ -2,9 +2,10 @@ import React, {useState} from 'react';
 import '../style/post-handicraft-for-sale.css';
 import {ethers} from 'ethers'
 import {create as ipfsHttpClient} from 'ipfs-http-client'
-import {marketplaceAddress} from '../../config'
+import {marketplaceAddress, tokenAddress} from '../../config'
 
 import HandicraftMarketPlace from 'contracts/BitCrafty_Contract.json'
+import Uniq from 'contracts/UNIQ.json'
 
 
 const ipfsClient = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0')
@@ -47,7 +48,10 @@ export default function PostHandicraftForSale() {
         await window.ethereum.enable();
         const provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
         const contract = new ethers.Contract(marketplaceAddress, HandicraftMarketPlace.abi, provider.getSigner())
+        const tokenContract = new ethers.Contract(tokenAddress, Uniq.abi, provider.getSigner())
         try {
+            let listingPrice = await contract.getListingPrice(priceInEther)
+            await tokenContract.approve(marketplaceAddress, listingPrice);
             let transaction = await contract.createHandicraftToken(url, priceInEther)
             await transaction.wait()
         } catch (error) {

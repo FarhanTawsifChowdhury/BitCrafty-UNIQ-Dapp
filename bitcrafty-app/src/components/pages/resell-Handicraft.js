@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import '../style/post-handicraft-for-sale.css';
 import {ethers} from 'ethers'
-import {marketplaceAddress} from '../../config'
+import {marketplaceAddress, tokenAddress} from '../../config'
 
 import HandicraftMarketPlace from 'contracts/BitCrafty_Contract.json'
+import Uniq from 'contracts/UNIQ.json'
 
 function ResellHandicraft() {
     const [input, updateInput] = useState({handicraftImage: '', handicraftPrice: ''})
@@ -18,28 +19,31 @@ function ResellHandicraft() {
     }, [])
 
     async function loadHandicraft() {
-        fetch(tokenURI).then(value => value.json()).then(data => updateInput(state => ({...state, handicraftImage: data.image})))
+        fetch(tokenURI).then(value => value.json()).then(data => updateInput(state => ({
+            ...state,
+            handicraftImage: data.image
+        })))
     }
 
     async function listHandicraftForSale() {
         await window.ethereum.enable();
         const provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
         const contract = new ethers.Contract(marketplaceAddress, HandicraftMarketPlace.abi, provider.getSigner())
+        const tokenContract = new ethers.Contract(tokenAddress, Uniq.abi, provider.getSigner())
         let priceInEther = null
-        try{
+        try {
             priceInEther = ethers.utils.parseUnits(input.handicraftPrice, 'ether')
-        }
-        catch (e){
+        } catch (e) {
             alert("Please enter a decimal value for price")
             window.location.reload();
             return
         }
-        try{
+        try {
+            let listingPrice = await contract.getListingPrice(priceInEther)
+            await tokenContract.approve(marketplaceAddress, listingPrice);
             const transaction = await contract.resellHandicraft(tokenId, priceInEther)
             await transaction.wait()
-        }
-        catch (error)
-        {
+        } catch (error) {
             alert(error.data.message);
             return
         }
@@ -62,7 +66,9 @@ function ResellHandicraft() {
                 )
             }
             <br/>
-            <button className="mt-4 w-full bg-pink-500 text-white font-bold py-2 px-12 rounded" onClick={listHandicraftForSale}>List Item for Sale</button>
+            <button className="mt-4 w-full bg-pink-500 text-white font-bold py-2 px-12 rounded"
+                    onClick={listHandicraftForSale}>List Item for Sale
+            </button>
         </div>
     )
 }

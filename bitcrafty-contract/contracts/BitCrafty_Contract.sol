@@ -120,10 +120,13 @@ contract BitCrafty_Contract {
 
     function redeemReward(uint reward) public amountSpentIsGreaterThan10 payable {
         require(uniq.balanceOf(address(this)) > msg.value, "Smart contract balance should at least be greater than reward ");
+        uniq.approve(address(this), reward);
         transferTokens(reward, msg.sender, address(this));
         totalPurchaseValue[msg.sender] = 0;}
 
-    function transferTokens(uint256 amount, address to, address from) public payable {uniq.transferTokensTo(from, to, amount);}
+    function transferTokens(uint256 amount, address to, address from) public payable {
+        uniq.transferFrom(from, to, amount);
+    }
 
     function registrationReward() public {
         if (!isPresent[msg.sender] == true) {

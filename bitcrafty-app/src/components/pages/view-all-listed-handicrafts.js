@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import '../style/view-all-listed-handicrafts.css';
 import {ethers} from 'ethers'
-import {marketplaceAddress} from '../../config'
+import {marketplaceAddress, tokenAddress} from '../../config'
 import HandicraftMarketPlace from 'contracts/BitCrafty_Contract.json'
+import UNIQ from 'contracts/UNIQ.json'
 
 function ViewAllListedHandicrafts() {
     const [handicrafts, setHandicrafts] = useState([])
@@ -53,8 +54,10 @@ function ViewAllListedHandicrafts() {
         await window.ethereum.enable();
         const provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
         const contract = new ethers.Contract(marketplaceAddress, HandicraftMarketPlace.abi, provider.getSigner())
-
+        const tokenContract = new ethers.Contract(tokenAddress, UNIQ.abi, provider.getSigner())
         try {
+            let priceInEther = ethers.utils.parseUnits(handicraft.price, 'ether')
+            await tokenContract.approve(marketplaceAddress, priceInEther)
             const transaction = await contract.createMarketSale(handicraft.handicraftId)
             await transaction.wait()
         } catch (error) {
