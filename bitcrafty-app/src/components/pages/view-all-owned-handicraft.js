@@ -60,7 +60,7 @@ function ViewAllOwnedHandicrafts() {
                         <div key={index} className="card">
                             <img src={handicraft.image} alt="Product Reselling" className="handicraftImage"/>
                             <h1>Name:{handicraft.name}</h1>
-                            <p className="price">Price:{handicraft.price} ETH</p>
+                            <p className="price">Price:{handicraft.price} UNIQ</p>
                             <p>Description:{handicraft.description}</p>
                             <p>
                                 <button className="mt-4 w-full bg-pink-500 text-white font-bold py-2 px-12 rounded"

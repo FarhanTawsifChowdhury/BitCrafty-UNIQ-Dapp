@@ -54,7 +54,7 @@ function ViewUserListedHandicrafts() {
                         <div key={i} className="card">
                             <img src={handicraft.image} alt="Product Selling" className="handicraftImage"/>
                             <h1>Name:{handicraft.name}</h1>
-                            <p className="price">Price:{handicraft.price} ETH</p>
+                            <p className="price">Price:{handicraft.price} UNIQ</p>
                             <p>Description:{handicraft.description}</p>
                         </div>
                     )

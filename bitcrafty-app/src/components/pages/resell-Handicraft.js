@@ -55,7 +55,7 @@ function ResellHandicraft() {
         <div>
             <br/>
             <input
-                placeholder="Asset Price in Eth"
+                placeholder="Asset Price in UNIQ"
                 className="assetPrice"
                 onChange={e => updateInput({...input, handicraftPrice: e.target.value})}
             />
