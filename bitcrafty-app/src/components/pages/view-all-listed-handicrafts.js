@@ -83,6 +83,7 @@ function ViewAllListedHandicrafts() {
             alert(error.data.message);
         }
         setLoadingTokens("loaded");
+        loadHandicrafts();
     }
 
     if (loadTokens === 'not-loaded' && loadingState === 'not-loaded')
