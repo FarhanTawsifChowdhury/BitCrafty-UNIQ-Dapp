@@ -10,8 +10,4 @@ contract UNIQ is ERC20 {mapping(address => bool) public isPresent;
 
     function airdrop(address receiver) public {_transfer(owner, receiver, 1000000000000000000000);}
 
-    function getERC20Owner() view public returns (address) {return owner;}
-
-    function transferTokensTo(address from, address to, uint256 amount) public {_transfer(from, to, amount);}
-
 }

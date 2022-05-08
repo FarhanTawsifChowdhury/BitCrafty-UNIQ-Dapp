@@ -7,7 +7,6 @@ import {
 } from '../../config'
 
 import HandicraftMarketPlace from 'contracts/BitCrafty_Contract.json'
-//import Uniq from 'contracts/UNIQ.json'
 
 function FetchRewards() {
     const [rewardState, setRewardState] = useState('zero')
@@ -18,13 +17,9 @@ function FetchRewards() {
         await window.ethereum.enable();
         const provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
         const contract = new ethers.Contract(marketplaceAddress, HandicraftMarketPlace.abi, provider.getSigner())
-        //const tokencontract = new ethers.Contract(tokenAddress, Uniq.abi, provider.getSigner())
         try{
-           // alert(await tokencontract.balanceOf(marketplaceAddress))
             let reward = await contract.fetchRewards()
-            //alert(reward)
             reward = ethers.utils.formatUnits(reward.toString(), 'ether')
-           // alert(reward)
             if (reward >= 0.1){
                 setRewardState(reward)
             }
@@ -39,7 +34,6 @@ function FetchRewards() {
         const provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
         const contract = new ethers.Contract(marketplaceAddress, HandicraftMarketPlace.abi, provider.getSigner())
         let reward = ethers.utils.parseUnits(rewardState, 'ether')
-       // alert(reward)
         try{
             const transaction = await contract.redeemReward(reward)
             await transaction.wait()
@@ -57,7 +51,7 @@ function FetchRewards() {
             <div className="nftsListedBySellers">
                 {
                         <div>
-                            <h2>You have rewards worth {rewardState} ETH, Redeem for minimal gas!</h2>
+                            <h2>You have rewards worth {rewardState} UNIQ, Redeem for minimal gas!</h2>
                             <p>
                                 <button className="mt-4 w-full bg-pink-500 text-white font-bold py-2 px-12 rounded" onClick={() => redeemReward()}>Redeem Now!</button>
                             </p>
