@@ -40,7 +40,8 @@ function ResellHandicraft() {
         }
         try {
             let listingPrice = await contract.getListingPrice(priceInEther)
-            await tokenContract.approve(marketplaceAddress, listingPrice);
+            let transactionForApproval = await tokenContract.approve(marketplaceAddress, listingPrice);
+            await transactionForApproval.wait()
             const transaction = await contract.resellHandicraft(tokenId, priceInEther)
             await transaction.wait()
         } catch (error) {

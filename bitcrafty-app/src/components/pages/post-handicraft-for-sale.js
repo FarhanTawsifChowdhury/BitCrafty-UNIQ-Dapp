@@ -51,7 +51,8 @@ export default function PostHandicraftForSale() {
         const tokenContract = new ethers.Contract(tokenAddress, Uniq.abi, provider.getSigner())
         try {
             let listingPrice = await contract.getListingPrice(priceInEther)
-            await tokenContract.approve(marketplaceAddress, listingPrice);
+            let transactionForApproval = await tokenContract.approve(marketplaceAddress, listingPrice);
+            await transactionForApproval.wait()
             let transaction = await contract.createHandicraftToken(url, priceInEther)
             await transaction.wait()
         } catch (error) {

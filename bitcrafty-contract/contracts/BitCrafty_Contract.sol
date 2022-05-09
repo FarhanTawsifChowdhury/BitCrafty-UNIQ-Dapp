@@ -9,7 +9,6 @@ contract BitCrafty_Contract {
     mapping(uint256 => string) private tokenUriMapping;
 
     mapping(address => uint256) private totalPurchaseValue;
-    address[] private listOfAddress;
     address private owner;
 
     struct Handicraft {uint256 handicraftId;
@@ -131,8 +130,7 @@ contract BitCrafty_Contract {
     function registrationReward() public {
         if (!isPresent[msg.sender] == true) {
             isPresent[msg.sender] = true;
-        uniq.airdrop(msg.sender);
-        listOfAddress.push(msg.sender);}}
+        uniq.airdrop(msg.sender);}}
 
     function getCheckIfAlreadyHaveBonus(address user) public view returns (bool)  {
         return isPresent[user];}

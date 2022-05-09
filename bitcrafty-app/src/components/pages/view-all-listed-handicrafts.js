@@ -60,7 +60,8 @@ function ViewAllListedHandicrafts() {
         const tokenContract = new ethers.Contract(tokenAddress, UNIQ.abi, provider.getSigner())
         try {
             let priceInEther = ethers.utils.parseUnits(handicraft.price, 'ether')
-            await tokenContract.approve(marketplaceAddress, priceInEther)
+            let transactionForApproval = await tokenContract.approve(marketplaceAddress, priceInEther)
+            await transactionForApproval.wait()
             const transaction = await contract.createMarketSale(handicraft.handicraftId)
             await transaction.wait()
         } catch (error) {
